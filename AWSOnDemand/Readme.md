@@ -1,3 +1,60 @@
+# AWSOnDemand Notes:
+
+This project allows for:
++ Listing EC2 instances
++ Starting EC2 instances
++ Stopping EC2 instances
++ Listing RDS instances 
++ Snapshotting RDS instances
++ Deleting RDS instances
++ Restoring RDS instances from snapshot and time
+
+# Example JSON to use:
+{
+  "Ec2Actions": "StartEc2Instances",
+  "RdsActions": "ListRdsInstances",
+  "Tag": "TagValue"
+}
+
+# Snapshot naming convention
+snapshot-{dbinstanceidentifier}-{DateTime in yyyyMMddhhmm}
+e.g. snapshot-myDb-20170227045824
+
+# Logging Examples
+```
+START RequestId: 9cb03eb3-adad-11e6-a90b-f7b88886b41f Version: $LATEST
+Running ec2 instances automation.
+Looking for tags matching: {tag}
+Found item: key: Name, value: {tag}, resouceId: {resourceId}, resourceType: instance
+Returning instanceId: {instanceId}
+Starting Ec2 instances with tag: {tag}
+Starting instance:
+{
+    "CurrentState": {
+        "Code": 0,
+        "Name": {
+            "Value": "pending"
+        }
+    },
+    "InstanceId": "{instanceId}",
+    "PreviousState": {
+        "Code": 80,
+        "Name": {
+            "Value": "stopped"
+        }
+    }
+}
+
+Looking for tags matching: {tag}
+Found db instance item: instanceArn: arn:aws:rds:us-east-1:11223123:db:{dbinstanceidentifier}, dbName: {dbinstanceIdentifier}, engine: ostgres
+Listing Rds instances with tag: {tag}
+Looking for tags matching: {tag}
+Found db instance item: instanceArn: arn:aws:rds:us-east-1:3214123321321:db:{dbinstanceidentifier}, dbName: {dbinstanceidentifier}, engine: postgres
+END RequestId: 9cb03eb3-adad-11e6-a90b-f7b88886b41f
+REPORT RequestId: 9cb03eb3-adad-11e6-a90b-f7b88886b41f	Duration: 7396.04 ms	Billed Duration: 7400 ms Memory Size: 256 MB	Max Memory Used: 42 MB	
+```
+
+
 # AWS Lambda Empty Function Project
 
 This starter project consists of:
