@@ -11,6 +11,7 @@ namespace AWSOnDemand
         public const string kStopEc2Instances = "StopEc2Instances";
         public const string kStartRdsInstances = "StartRdsInstances";
         public const string kStopRdsInstances = "StopRdsInstances";
+        public const string kSnapshotRdsInstances = "SnapshotRdsInstances";
         public const string kListRdsInstances = "ListRdsInstances";
         public const string kListEc2Instances = "ListEc2Instances";
     }

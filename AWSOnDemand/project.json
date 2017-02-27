@@ -12,7 +12,11 @@
     },
     "AWSSDK.EC2": "3.3.10",
     "AWSSDK.RDS": "3.3.7",
-    "Microsoft.NETCore.App": "1.1.0"
+    "Microsoft.NETCore.App": {
+      "type": "platform",
+      "version": "1.1.0"
+    }  
+
   },
 
   "tools": {

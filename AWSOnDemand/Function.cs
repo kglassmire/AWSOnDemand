@@ -66,6 +66,10 @@ namespace AWSOnDemand
                     success = CreateDbSnapshots(listRdsInstances);
                     success = DeleteRdsInstance(listRdsInstances);
                     break;
+                case Consts.kSnapshotRdsInstances:
+                    Console.WriteLine("Snapshotting instances with tag: {0}", awsAutomation.Tag);
+                    success = CreateDbSnapshots(listRdsInstances);
+                    break;
                 case Consts.kListRdsInstances:
                     Console.WriteLine("Listing Rds instances with tag: {0}", awsAutomation.Tag);
                     var instances = FindRdsInstancesWithSpecifiedTag(awsAutomation.Tag);
@@ -263,6 +267,8 @@ namespace AWSOnDemand
             {
                 try
                 {
+                    Console.WriteLine("Deleting RDS instance for {0}", item.DBInstanceIdentifier);
+
                     var deleteDbInstanceRequest = new DeleteDBInstanceRequest(item.DBInstanceIdentifier);
                     var deleteDbInstanceResponse = _rdsClient.DeleteDBInstanceAsync(deleteDbInstanceRequest, CancellationToken.None);                    
                 }
@@ -283,6 +289,8 @@ namespace AWSOnDemand
             {
                 try
                 {
+                    Console.WriteLine("Creating db snapshot for {0}", item.DBInstanceIdentifier);
+
                     var createDbSnapshotRequest =
                         new CreateDBSnapshotRequest(
                             String.Format("snapshot-{0}-{1}", item.DBInstanceIdentifier,
