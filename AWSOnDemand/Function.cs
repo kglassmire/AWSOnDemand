@@ -42,7 +42,44 @@ namespace AWSOnDemand
             Console.WriteLine("Running ec2 instances automation.");
 
             result = ProcessEc2Instances(awsAutomation);
+            result = ProcessRdsInstances(awsAutomation);
             return true;
+        }
+
+        private bool ProcessRdsInstances(AWSAutomation awsAutomation)
+        {
+            bool success = true;
+            // find RDS instances with tags we need
+            var listRdsInstances = FindRdsInstancesWithSpecifiedTag(awsAutomation.Tag);
+            if (listRdsInstances.Count == 0)
+                return false;
+
+            switch (awsAutomation.RdsActions)
+            {
+                case Consts.kStartRdsInstances:
+                    Console.WriteLine("Starting instances with tag: {0}", awsAutomation.Tag);
+                    var snapshots = FindRdsSnapshotsWithSpecifiedTag(awsAutomation.Tag);
+                    success = CreateRdsInstanceFromSnapshots(snapshots);
+                    break;
+                case Consts.kStopRdsInstances:
+                    Console.WriteLine("Stopping instances with tag: {0}", awsAutomation.Tag);
+                    success = CreateDbSnapshots(listRdsInstances);
+                    success = DeleteRdsInstance(listRdsInstances);
+                    break;
+                case Consts.kListRdsInstances:
+                    Console.WriteLine("Listing Rds instances with tag: {0}", awsAutomation.Tag);
+                    var instances = FindRdsInstancesWithSpecifiedTag(awsAutomation.Tag);
+                    break;
+                default:
+                    if (!String.IsNullOrEmpty(awsAutomation.RdsActions))
+                    {
+                        throw new NotImplementedException("RdsAction parameter was provided but no matching action is implemented.");
+                    }
+                    break;
+
+            }
+
+            return success;
         }
 
         private bool ProcessEc2Instances(AWSAutomation awsAutomation)
@@ -53,17 +90,28 @@ namespace AWSOnDemand
                 return false;
 
             // stop those instances
-            if (awsAutomation.Ec2Actions == Ec2Actions.StartEC2Instances)
+            switch (awsAutomation.Ec2Actions)
             {
-                Console.WriteLine("Starting instances with tag: {0}", awsAutomation.Tag);
-                StartEc2Instances(listEc2Instances);
+                case Consts.kStartEc2Instances:
+                    Console.WriteLine("Starting Ec2 instances with tag: {0}", awsAutomation.Tag);
+                    StartEc2Instances(listEc2Instances);
+                    break;
+                case Consts.kStopEc2Instances:
+                    Console.WriteLine("Stopping Ec2 instances with tag: {0}", awsAutomation.Tag);
+                    StopEc2Instances(listEc2Instances);
+                    break;
+                case Consts.kListEc2Instances:
+                    Console.WriteLine("Listing Ec2 instances with tag: {0}", awsAutomation.Tag);
+                    var instances = FindEC2InstancesWithSpecifiedTag(awsAutomation.Tag);
+                    break;
+                default:
+                    if (!String.IsNullOrEmpty(awsAutomation.Ec2Actions))
+                    {
+                        throw new NotImplementedException("RdsAction parameter was provided but no matching action is implemented.");
+                    }
+                    break;
             }
-            else if (awsAutomation.Ec2Actions == Ec2Actions.StopEC2Instances)
-            {
-                Console.WriteLine("Stopping instances with tag: {0}", awsAutomation.Tag);
-                StopEc2Instances(listEc2Instances);
-            }
-            
+
             return true;
         }
 
@@ -298,21 +346,9 @@ namespace AWSOnDemand
 
         public class AWSAutomation
         {
-            public Ec2Actions Ec2Actions { get; set; }            
-            public RdsActions RdsActions { get; set; }
+            public string Ec2Actions { get; set; }            
+            public string RdsActions { get; set; }
             public string Tag { get; set; }
-        }
-
-        public enum Ec2Actions
-        {
-            StartEC2Instances,
-            StopEC2Instances
-        }
-
-        public enum RdsActions
-        {
-            RestoreRDSInstances,
-            DeleteRDSInstances
         }
     }
 
